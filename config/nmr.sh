@@ -78,6 +78,8 @@ if  [ ! "$(cat step3.xyz)" ]; then
 	echo "step 3 got wrong !"
 	exit
 elif [ -f step4.xyz ] && [ "$(cat step4.xyz)" ]; then
+	echo "[$(date +%Y-%m-%d\ %H:%M:%S)]: step 4 has been done"
+else
 	echo "[$(date +%Y-%m-%d\ %H:%M:%S)]: step 4 start"
 	cp step3.xyz molclus/traj.xyz
 	cd molclus
@@ -95,8 +97,6 @@ elif [ -f step4.xyz ] && [ "$(cat step4.xyz)" ]; then
 	awk '/Ratio/' $workDir/logs/step4_isostat.log > $workDir/ratio.txt
 	mv cluster.xyz $workDir/step4.xyz
 	rm traj.xyz
-else
-	echo "[$(date +%Y-%m-%d\ %H:%M:%S)]: step 4 has been done"
 fi
 
 
