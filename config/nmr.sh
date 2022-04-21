@@ -21,12 +21,10 @@ cp -r $root/config/molclus $workDir/
 
 # chmod +X files
 
-cd molclus
-
 # Step 1 Conformation Search using xtb, output 2000 conformations
 # if the conformations change greatly the isostat software wil get wrong isomers
 cd $workDir
-if [ -f step1.xyz ] || [ ! "$(cat step1.xyz)" ]; then
+if [ -f step1.xyz ] && [ "$(cat step1.xyz)" ]; then
 	echo "[$(date +%Y-%m-%d\ %H:%M:%S)]: step 1 has been done"
 else
 	echo "[$(date +%Y-%m-%d\ %H:%M:%S)]: step 1 start"
@@ -41,7 +39,9 @@ cd $workDir
 if  [ ! "$(cat step1.xyz)" ]; then
 	echo "step 1 got wrong !"
 	exit
-elif [ ! -f step2.xyz ] || [ ! "$(cat step2.xyz)" ]; then
+elif [ -f step2.xyz ] && [ "$(cat step2.xyz)" ]; then
+	echo "[$(date +%Y-%m-%d\ %H:%M:%S)]: step 2 has been done"
+else
 	echo "[$(date +%Y-%m-%d\ %H:%M:%S)]: step 2 start"
 	cp step1.xyz molclus/traj.xyz
 	cd molclus
@@ -51,8 +51,6 @@ elif [ ! -f step2.xyz ] || [ ! "$(cat step2.xyz)" ]; then
 	./isostat isomers.xyz -Gdis 0.5 -Edis 0.5 -T 298.15 > $workDir/logs/step2_isostat.log
 	mv cluster.xyz $workDir/step2.xyz
 	rm traj.xyz
-else
-	echo "[$(date +%Y-%m-%d\ %H:%M:%S)]: step 2 has been done"
 fi
 
 # Step 3 Conformation Optimization using molclus with xtb GFN2-xTB
@@ -60,7 +58,9 @@ cd $workDir
 if  [ ! "$(cat step2.xyz)" ]; then
 	echo "step 2 got wrong !"
 	exit
-elif [ ! -f step3.xyz ] || [ ! "$(cat step3.xyz)" ]; then
+elif [ -f step3.xyz ] && [ "$(cat step3.xyz)" ]; then
+	echo "[$(date +%Y-%m-%d\ %H:%M:%S)]: step 3 has been done"
+else
 	echo "[$(date +%Y-%m-%d\ %H:%M:%S)]: step 3 start"
 	cp step2.xyz molclus/traj.xyz
 	cd molclus
@@ -70,8 +70,6 @@ elif [ ! -f step3.xyz ] || [ ! "$(cat step3.xyz)" ]; then
 	./isostat isomers.xyz -Gdis 0.5 -Edis 0.5 -T 298.15 > $workDir/logs/step3_isostat.log
 	mv cluster.xyz $workDir/step3.xyz
 	rm traj.xyz
-else
-	echo "[$(date +%Y-%m-%d\ %H:%M:%S)]: step 3 has been done"
 fi
 
 # Step 4 Conformation Optimization using molclus with Gaussian & ORCA
@@ -79,7 +77,7 @@ cd $workDir
 if  [ ! "$(cat step3.xyz)" ]; then
 	echo "step 3 got wrong !"
 	exit
-elif [ ! -f step4.xyz ] || [ ! "$(cat step4.xyz)" ]; then
+elif [ -f step4.xyz ] && [ "$(cat step4.xyz)" ]; then
 	echo "[$(date +%Y-%m-%d\ %H:%M:%S)]: step 4 start"
 	cp step3.xyz molclus/traj.xyz
 	cd molclus
@@ -115,8 +113,13 @@ cat logs/structure.smi
 
 # caculate TMS nmr with Gaussian
 cd $workDir
-if [ ! -f $root/TMS.out ]; then
-    if [ ! -f TMS.xyz ]; then
+if [ -f $root/TMS.out ] && [ "$(cat $root/TMS.out)" ]; then
+	echo "[$(date +%Y-%m-%d\ %H:%M:%S)]: TMS out exist"
+    cp $root/TMS.out $workDir
+else
+    if [ -f TMS.xyz ] && [ "$(cat TMS.xyz)" ]; then
+	    echo "[$(date +%Y-%m-%d\ %H:%M:%S)]: TMS xyz exist"
+    else
 	    echo "[$(date +%Y-%m-%d\ %H:%M:%S)]: compute TMS structure"
     	cp $root/config/TMS.xyz $workDir/molclus/traj.xyz
 	    cp $root/config/settings4.ini $workDir/molclus/settings.ini
@@ -125,17 +128,12 @@ if [ ! -f $root/TMS.out ]; then
     	./molclus > $workDir/logs/tms.log
 	    ./isostat isomers.xyz -Gdis 0.5 -Edis 0.5 -T 298.15 > $workDir/logs/tms.log
     	mv cluster.xyz $workDir/TMS.xyz
-    else
-	    echo "[$(date +%Y-%m-%d\ %H:%M:%S)]: TMS xyz exist"
     fi
     cd $workDir
 	echo "[$(date +%Y-%m-%d\ %H:%M:%S)]: compute TMS NMR"
 	cp $root/config/NMR_template.gjf ./template.gjf
 	$workDir/molclus/xyz2QC < $root/config/inp1.txt > /dev/null
 	g16 Gaussian.gjf $workDir/TMS.out
-else
-	echo "[$(date +%Y-%m-%d\ %H:%M:%S)]: TMS out exist"
-    cp $root/TMS.out $workDir
 fi
 
 Ciso=$(awk '/C.*Isotropic/ {sum+=$5; base+=1} END {print sum/base}' TMS.out)
@@ -145,13 +143,13 @@ echo $Hiso > $workDir/logs/HNMR.log
 
 # compute target nmr
 cd $workDir
-if [ ! -f target.out ] || [ ! "$(cat target.out)" ]; then
+if [ -f target.out ] && [ "$(cat target.out)" ]; then
+        echo "[$(date +%Y-%m-%d\ %H:%M:%S)]: Target NMR exist"
+else
         echo "[$(date +%Y-%m-%d\ %H:%M:%S)]: compute target NMR"
         cp $root/config/NMR_template.gjf ./template.gjf
         $workDir/molclus/xyz2QC < $root/config/inp2.txt > /dev/null
         g16 Gaussian.gjf $workDir/target.out
-else
-        echo "[$(date +%Y-%m-%d\ %H:%M:%S)]: Target NMR exist"
 fi
 rm *.gjf
 awk '/ C .*Isotropic|NMR.*\\/{if($5 ~ /^[0-9.-]+$/){print $0 "   ppm = " base-$5;} else {print $0;}}' base=$Ciso $workDir/target.out >> $workDir/logs/CNMR.log
