@@ -1,0 +1,6 @@
+! B97-3c opt miniprint nopop noautostart
+%maxcore 1000
+%pal nprocs 4 end
+* xyz 0 1 
+[GEOMETRY]
+*

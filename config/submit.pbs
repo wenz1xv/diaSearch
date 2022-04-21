@@ -1,0 +1,31 @@
+#PBS -l nodes=1:ppn=28
+#PBS -j oe
+
+cd $PBS_O_WORKDIR
+
+:> isomers.smi
+:> CNMR.txt
+:> HNMR.txt
+for file in $(ls struc);
+do
+        dirname=${file%.*}
+        sed -i "2c $dirname" struc/$file
+        obabel struc/$file -osmi >> isomers.smi
+        obabel struc/$file -O inp.xyz
+        if [ ! "$(awk '{if($2!=0 && NR>2) x++} END {print x}' inp.xyz)" ]; then
+                echo "molecule $file is wrong"
+        else
+                chmod +x nmr.sh
+                ./nmr.sh
+                if [[ ! -f TMS.out ]]; then
+                        cp $dirname/nmr_result.txt nmr.txt
+                        cp $dirname/TMS.out TMS.out
+                else
+                        cp nmr.txt nmr_0.txt
+                        join nmr_0.txt $dirname/nmr_result.txt > nmr.txt
+                fi
+                awk '{print $2}' $dirname/CNMR.txt | xargs | sed 's/ /,/g' >> CNMR.txt
+                awk '{print $2}' $dirname/HNMR.txt | xargs | sed 's/ /,/g' >> HNMR.txt
+        fi
+done
+

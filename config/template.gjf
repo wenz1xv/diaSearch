@@ -1,0 +1,10 @@
+%nprocshared=28
+%mem=56GB
+# B3LYP/6-31G* NMR scrf(SMD,solvent=Chloroform)
+
+Template file
+
+0 1
+[GEOMETRY]
+
+

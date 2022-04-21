@@ -1,0 +1,9 @@
+%nprocshared=28
+%mem=56GB
+# B3LYP/6-31G* em=GD3BJ opt freq int=fine
+
+Template file
+
+0 1
+[GEOMETRY]
+
