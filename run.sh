@@ -44,8 +44,11 @@ elif [ ! $name ]; then
         echo -e "${red}please input name at the second column of smiles.txt. ${ed}"
         exit
 elif [ ! -d  $name ]; then
+        echo "make dir $name and start the job"
         mkdir $name
         mkdir $name/struc
+else
+        echo "dir $name exist, continue the job"
 fi
 cp $inpfile $name
 cp -r config $name
