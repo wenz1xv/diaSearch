@@ -61,5 +61,4 @@ sed -i "6s/chloroform/$solvent/" config/template_SP.inp
 cp config/autorun.pbs ./
 cp config/nmr.sh ./
 chmod +x nmr.sh config/molclus/molclus config/molclus/isostat config/molclus/xyz2QC
-:>${name}.log
-qsub -o ${name}.log -e ${name}.log -N $name autorun.pbs
+qsub -N $name autorun.pbs

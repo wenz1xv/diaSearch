@@ -37,7 +37,10 @@ replace(){
 }
 
 # enumerate structure by SMILES format
-if [ ! -f $smifile ] || [ ! "$(cat $smifile)" ]; then
+if [  -f $smifile ] && [ "$(cat $smifile)" ]; then
+        cnt=$(awk '!x[$1++]' $smifile|wc -l)
+        echo "smifile exist, Here are $cnt conformations"
+else
         echo "[$(date +%Y-%m-%d\ %H:%M:%S)]: Getting smi template"
         cnt=0
         : > $smifile
@@ -56,9 +59,6 @@ if [ ! -f $smifile ] || [ ! "$(cat $smifile)" ]; then
         else
                 echo "Here are $cnt conformations"
         fi
-else
-        cnt=$(awk '!x[$1++]' $smifile|wc -l)
-        echo "smifile exist, Here are $cnt conformations"
 fi
 
 echo "[$(date +%Y-%m-%d\ %H:%M:%S)]: get smiles template finished"
@@ -69,7 +69,11 @@ do
         awk 'NR=='$i' {print $0}' $smifile > tmp.smi
         mol=$(awk 'NR=='$i' {print $2}' $smifile)
         echo "Generating ${mol}"
-        obabel tmp.smi -oxyz -O struc/${mol}.xyz --gen3D -h
+        if [ -f struc/${mol}.xyz ] && [ "$(awk '{if($2!=0 && NR>2) x++} END {print x}' struc/${mol}.xyz)"  ]; then
+                echo "mol $mol exist"
+        else
+                obabel tmp.smi -oxyz -O struc/${mol}.xyz --gen3D -h
+        fi
         rm tmp.smi
         if [ ! "$(awk '{if($2!=0 && NR>2) x++} END {print x}' struc/${mol}.xyz)" ]; then
                 echo "$i : molecule $mol is wrong$"
@@ -82,15 +86,19 @@ echo "[$(date +%Y-%m-%d\ %H:%M:%S)]: $name structure enumerate finished"
 
 
 echo "generate carbon file"
-:>tmp.xyz
-nums=$(awk '/C /{print NR}' struc/${mol}.xyz)
-for i in $nums;
-do
-        sed "${i}s/C /Si/" struc/${mol}.xyz | sed "2c carbon=$[$i-2]" >> tmp.xyz
-done
-obabel tmp.xyz -O $carbonfile
-rm tmp.xyz
 
+if [ -f $carbonfile ] && [ "$(cat $carbonfile)" ]; then
+        echo "carbon file $carbonfile exist"
+else
+        :>tmp.xyz
+        nums=$(awk '/C /{print NR}' struc/${mol}.xyz)
+        for i in $nums;
+        do
+                sed "${i}s/C /Si/" struc/${mol}.xyz | sed "2c carbon=$[$i-2]" >> tmp.xyz
+        done
+        obabel tmp.xyz -O $carbonfile
+        rm tmp.xyz
+fi
 
 echo "[$(date +%Y-%m-%d\ %H:%M:%S)] : NMR job start "
 :> CNMR.txt
