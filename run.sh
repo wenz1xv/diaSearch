@@ -1,9 +1,22 @@
 #!/bin/bash
 
-# environment test
-struDir=$1
-name=$2
+####################################################################################
+#                       Diastereomer Search based on NMR V-0.91
+#       1. Enumerate the Diastereomers
+#       2. Compute the NMR of each diastereomers
+#       3. Compare and calculate the probility of each diastereomers
+#
+####################################################################################
+
+# perset
+inpfile="smiles.txt"
 solvent="methanol"
+
+name="$(awk '{print $2}' $inpfile)_NMR"
+red='\033[1;31m'
+ed='\033[0m'
+
+# environment test
 if [ ! $ORCA_PATH ]; then
     echo "ORCA PATH not exist"
     exit
@@ -19,28 +32,30 @@ elif [ ! "$(which xtb)" ]; then
 elif [ ! "$(which mpirun)" ]; then
     echo "openmpi not exist"
     exit
+elif [ ! -f $inpfile ]; then
+        echo -e "${red}smiles.txt doesnt exist, please input smiles of the structure.${ed}"
+        : > $inpfile
+        exit
+elif [ ! "$(cat $inpfile)" ]; then
+        echo -e "${red}smiles.txt is empty, please input smiles of the structure.${ed}"
+        : > $inpfile
+        exit
 elif [ ! $name ]; then
-        echo "please input job name at first place "
-        exit
-elif [ ! $struDir ]; then
-        echo "please input mol dir at second place "
-        exit
-elif [ ! -d $struDir ]; then
-        echo "wrong, structure folder $struDir dont exist"
+        echo -e "${red}please input name at the second column of smiles.txt. ${ed}"
         exit
 elif [ ! -d  $name ]; then
         mkdir $name
-        echo "$(date +%Y-%m-%d\ %H:%M:%S) : mkdir $name and job start "
-else
-        echo "dir exist job start"
+        mkdir $name/struc
 fi
-
+cp $inpfile $name
 cp -r config $name
-cp -r $struDir $name/struc
+:>$inpfile
 cd $name
 sed -i "2s/Chloroform/${solvent^}" config/template.gjf
 sed -i "6s/chloroform/$solvent/" config/template_SP.gjf
 # sed -i "21s/chcl3/$solvent/" config/settings3.ini
-cp config/submit.pbs ./
+cp config/autorun.pbs ./
 cp config/nmr.sh ./
-qsub -o ${name}.log -e ${name}.log -N $name submit.pbs
+chmod +x nmr.sh config/molclus/molclus config/molclus/isostat config/molclus/xyz2QC
+:>${name}.log
+qsub -o ${name}.log -e ${name}.log -N $name autorun.pbs
