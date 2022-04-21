@@ -54,6 +54,7 @@ cp $inpfile $name
 cp -r config $name
 :>$inpfile
 cd $name
+echo "The solvent is $solvent ."
 sed -i "2s/Chloroform/${solvent^}/" config/NMR_template.gjf
 sed -i "6s/chloroform/$solvent/" config/template_SP.inp
 # sed -i "21s/chcl3/$solvent/" config/settings3.ini
