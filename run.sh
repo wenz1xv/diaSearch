@@ -7,16 +7,16 @@ solvent="methanol"
 if [ ! $ORCA_PATH ]; then
     echo "ORCA PATH not exist"
     exit
-elif [ ! $(which g16) ]; then
+elif [ ! "$(which g16)" ]; then
     echo "g16 not in your path"
     exit
-elif [ ! $(which obabel) ]; then
+elif [ ! "$(which obabel)" ]; then
     echo "openbabel not exist"
     exit
-elif [ ! $(which xtb) ]; then
+elif [ ! "$(which xtb)" ]; then
     echo "xtb not in your path"
     exit
-elif [ ! $(which mpirun) ]; then
+elif [ ! "$(which mpirun)" ]; then
     echo "openmpi not exist"
     exit
 elif [ ! $name ]; then
