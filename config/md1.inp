@@ -1,0 +1,8 @@
+$md
+   temp= 300  # in K
+   time= 0.2  # in ps
+   dump= 50.0  # in fs
+   step=  1.0  # in fs
+   hmass=1 # do not change mass of hydrogens
+   shake=1 # constraint X-H bonds
+$end

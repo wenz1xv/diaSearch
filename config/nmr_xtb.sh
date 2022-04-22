@@ -11,12 +11,10 @@ if [ -d $dirname ]; then
 else
     echo "mkdir $dirname"
 	mkdir $dirname
+	mkdir $workDir/logs
 	cp inp.xyz $dirname # copy the input file to work dir
 fi
 
-if [ ! -d $workDir/logs ]; then
-	mkdir $workDir/logs
-fi
 cp -r $root/config/molclus $workDir/
 
 # Step 1 Conformation Search using xtb, output 2000 conformations
@@ -75,7 +73,7 @@ cd $workDir
 if  [ ! "$(cat step3.xyz)" ]; then
 	echo "step 3 got wrong !"
 	exit
-elif [ -f step4.xyz ] && [ "$(cat step4.xyz)" ]; then
+elif [ -f final.xyz ] && [ "$(cat final.xyz)" ]; then
 	echo "[$(date +%Y-%m-%d\ %H:%M:%S)]: step 4 has been done"
 else
 	echo "[$(date +%Y-%m-%d\ %H:%M:%S)]: step 4 start"
@@ -93,18 +91,18 @@ else
     cp isomers.xyz $workDir/step4_isomers.xyz
 	./isostat isomers.xyz -Gdis 0.5 -Edis 0.5 -T 298.15 > $workDir/logs/step4_isostat.log
 	awk '/Ratio/' $workDir/logs/step4_isostat.log > $workDir/ratio.txt
-	mv cluster.xyz $workDir/step4.xyz
+	mv cluster.xyz $workDir/final.xyz
 	rm traj.xyz
 fi
 
 
 # get the smiles of conformation to sure the diastereomers
 cd $workDir
-if  [ ! "$(cat step4.xyz)" ]; then
+if  [ ! "$(cat final.xyz)" ]; then
 	echo "step 4 got wrong !"
 	exit
 elif [ ! -f logs/structure.smi ]; then
-    obabel step4.xyz -osmi | uniq> logs/structure.smi
+    obabel final.xyz -osmi | uniq> logs/structure.smi
 fi
 
 cat logs/structure.smi

@@ -1,6 +1,11 @@
-# 通过NMR计算确定非对映异构体 V1.0 / Determination of Diastereomers by NMR Computation Script V 1.0
+# 通过NMR计算确定非对映异构体 V1.0
+# Determination of Diastereomers by NMR Computation Script V 1.0
  
 ## 运行流程 / Workflow
+
+- run_xtb.sh    xtb构象搜索版本
+- run_confab.sh confab构象搜索版本
+- run_mix.sh    混合构象搜索版本
 
 ### 枚举构型 / Enumerate Isomers
 
@@ -17,16 +22,24 @@
 
 对Isomer.smi中每个构型生成构象并进行优化
 
-master分支采用此方法，用xtb进行模拟，部分长链化合物可能出现错误，采用系统搜索可以避免
-
 #### 分子动力学模拟
+
+run_xtb采用此方法，用xtb进行模拟，部分长链化合物可能出现错误
 
 参见：http://bbs.keinsci.com/thread-16255-1-1.html
 
-
 #### 系统搜索
 
-见gentor分支
+run_confab采用confab实现系统搜索，不考虑环的构象变化
+
+根据键的可旋转性，对每个可旋转的键进行旋转，但并不考虑环的构象。
+
+可用的程序有：
+- confab (openbabel plugin)
+- frog2
+- RDKIT
+
+> 混合方法可能集合两个优点，也可能集合两个缺点
 
 ### 计算NMR并根据玻尔兹曼分布加权 / Compute NMR and Weighted by Boltzmann Distribution
 

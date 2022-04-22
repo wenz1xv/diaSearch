@@ -47,6 +47,7 @@ elif [ ! -d  $name ]; then
         echo "make dir $name and start the job"
         mkdir $name
         mkdir $name/struc
+        mkdir $name/confab
 else
         echo "dir $name exist, continue the job"
 fi
@@ -54,12 +55,13 @@ cp $inpfile $name
 cp -r config $name
 :>$inpfile
 cd $name
-echo "The solvent is $solvent ."
+echo "The solvent is ${solvent}."
+echo "Work as confab isomers search mode."
 sed -i "2s/Chloroform/${solvent^}/" config/NMR_template.gjf
 sed -i "6s/chloroform/$solvent/" config/template_SP.inp
 # sed -i "21s/chcl3/$solvent/" config/settings3.ini
-cp config/autorun.pbs ./
-cp config/nmr.sh ./
-chmod +x nmr.sh config/molclus/molclus config/molclus/isostat config/molclus/xyz2QC
+cp config/submit_confab.pbs ./
+cp config/nmr_confab.sh ./
+chmod +x nmr_confab.sh config/molclus/molclus config/molclus/isostat config/molclus/xyz2QC
 :>info.log
-qsub -o info.log -e info.log -N $name autorun.pbs
+qsub -o info.log -e info.log -N $name submit_confab.pbs
