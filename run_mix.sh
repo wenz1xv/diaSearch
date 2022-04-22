@@ -47,6 +47,7 @@ elif [ ! -d  $name ]; then
         echo "make dir $name and start the job"
         mkdir $name
         mkdir $name/struc
+        mkdir $name/confab
 else
         echo "dir $name exist, continue the job"
 fi
