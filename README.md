@@ -58,10 +58,10 @@ def2TZVP是很大的基组，计算十分耗时，理论上精度也会更高。
 这部分功能依赖于python3 的scipy与numpy，如无必要可以在EXCEL中计算，在tools中的calp.py实现
 
 ## 依赖程序 / Requirement
-- gaussian
-- orca
-- xtb
-- open babel
+- [gaussian](https://gaussian.com/)
+- [orca](https://orcaforum.kofo.mpg.de/)
+- [xtb](https://github.com/grimme-lab/xtb)
+- [open babel](https://github.com/openbabel/openbabel)
 - python scipy numpy (optional)
  
 ## 环境变量 / Environment
@@ -108,14 +108,14 @@ export LD_LIBRARY_PATH=$HOME/opt/openbabel-3.1.1/lib:$LD_LIBRARY_PATH
 ## 文件目录 / File Directory
 
 ```
-- run.sh  # 自动运行脚本，基于 Torque/PBS 作业管理系统
+- run_*.sh  # 自动运行脚本，基于 Torque/PBS 作业管理系统，*对应不同构象搜索方法
 - smiles.txt # 输入分子文件
 - config/
-    - cal_nmr.sh # 构象搜索与NMR计算脚本
+    - nmr_*.sh # 构象搜索与NMR计算脚本，*对应不同构象搜索方法
+    - submit_*.sh # Torque/PBS提交脚本，*对应不同构象搜索方法
     - TMS.xyz # 标准物质TMS结构
-    - template.gjf # NMR计算时模板文件
-    - md.inp and settings{n}.ini # 构象搜索与优化配置文件
-    - inp{n}.txt # isostat等交互输入
+    - *.gjf # Gaussian模板文件
+    - md.inp and settings{n}.ini inp{n}.txt # 构象搜索与优化配置文件
     - molclus/ #  molclus程序文件夹
 ```
 
