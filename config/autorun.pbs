@@ -72,9 +72,10 @@ do
         if [ -f struc/${mol}.xyz ] && [ "$(awk '{if($2!=0 && NR>2) x++} END {print x}' struc/${mol}.xyz)"  ]; then
                 echo "mol $mol exist"
         else
-                obabel tmp.smi -oxyz -O struc/${mol}.xyz --gen3D -h
+                obabel tmp.smi -omol -O tmp.mol --gen2D -h
+                obabel tmp.mol -oxyz -O struc/${mol}.xyz --gen3D
         fi
-        rm tmp.smi
+        rm tmp.smi tmp.mol
         if [ ! "$(awk '{if($2!=0 && NR>2) x++} END {print x}' struc/${mol}.xyz)" ]; then
                 echo "$i : molecule $mol is wrong$"
                 awk 'NR=='$i' {print $0}' $smifile >> $failfile
@@ -103,6 +104,7 @@ fi
 echo "[$(date +%Y-%m-%d\ %H:%M:%S)] : NMR job start "
 :> CNMR.txt
 :> HNMR.txt
+:> structure.txt
 for file in $(ls struc);
 do
         dirname=${file%.*}
@@ -114,6 +116,8 @@ do
                 echo "molecule $file is wrong"
         else
                 ./nmr.sh
+                echo "$file" >> structure.txt
+                cat $dirname/logs/structure.smi >> structure.txt
                 if [[ ! -f TMS.out ]]; then
                         cp $dirname/nmr_result.txt nmr.txt
                         cp $dirname/TMS.out TMS.out
@@ -125,4 +129,6 @@ do
                 awk '{print $2}' $dirname/HNMR.txt | xargs | sed 's/ /,/g' >> HNMR.txt
         fi
 done
+
+rm nmr_0.txt
 

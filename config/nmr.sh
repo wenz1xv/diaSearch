@@ -19,8 +19,6 @@ if [ ! -d $workDir/logs ]; then
 fi
 cp -r $root/config/molclus $workDir/
 
-# chmod +X files
-
 # Step 1 Conformation Search using xtb, output 2000 conformations
 # if the conformations change greatly the isostat software wil get wrong isomers
 cd $workDir
