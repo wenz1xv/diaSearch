@@ -25,12 +25,12 @@ subreplace(){
 
 # $1 the smiles string
 replace(){
-        if [[ "$(echo $1 | grep tC=Ct)" ]]; then
-                replace "$(echo $1|sed 's/tC=Ct/\/C=C\\/')"
-                replace "$(echo $1|sed 's/tC=Ct/\/C=C\//')"
-        elif [[ "$(echo $1 | grep C=Ct)" ]]; then
-                replace "$(echo $1|sed 's/C=Ct/C=C\\/')"
-                replace "$(echo $1|sed 's/C=Ct/C=C\//')"
+        if [[ "$(echo $1 | grep t.=.t)" ]]; then
+                replace "$(echo $1|sed 's/t\(.\)=\(.\)t/\/\1=\2\\/')"
+                replace "$(echo $1|sed 's/t\(.\)=\(.\)t/\/\1=\2\//')"
+        elif [[ "$(echo $1 | grep t)" ]]; then
+                replace "$(echo $1|sed 's/t/\\/')"
+                replace "$(echo $1|sed 's/t/\//')"
         else
                 subreplace 1 "$1" 0
         fi
