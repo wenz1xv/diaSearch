@@ -115,7 +115,7 @@ do
         else
                 ./nmr_mix.sh
                 cat $dirname/logs/structure.smi >> structure.txt
-                sed -i "s/step.*/$file/" structure.txt
+                sed -i "s/final\.xyz/$file/" structure.txt
                 if [[ ! -f TMS.out ]]; then
                         cp $dirname/nmr_result.txt nmr.txt
                         cp $dirname/TMS.out TMS.out
