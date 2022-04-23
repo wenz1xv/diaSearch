@@ -30,12 +30,13 @@ else
 	fi
 	mkdir step1
 	cp xyz2QC step1/
+	cp inp.xyz step1/
 	cp $root/config/xtb.gjf step1/template.gjf
+	cd step1
 	sed -i "1c $(awk 'NR==1' inp.xyz)" template.gjf
 	sed -i "2c $(awk 'NR==2' inp.xyz)" template.gjf
-	cd step1
 	./xyz2QC < $root/config/inp3.txt > $workDir/logs/step1.log
-	rm template.gjf xyz2QC
+	rm template.gjf xyz2QC inp.xyz
 	cd ..
 	:>$workDir/step1.xyz
 	for file in $(ls step1);
