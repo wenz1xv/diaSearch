@@ -1,0 +1,26 @@
+#PBS -N calSR
+#PBS -l nodes=1:ppn=28
+#PBS -j oe
+
+cd $PBS_O_WORKDIR
+
+if [ ! -d SR_cal ]; then
+    mkdir SR_cal
+fi
+
+if [ ! -d SR_result ]; then
+    mkdir SR_result
+fi
+
+cp config/inp2.txt SR_cal/
+cp config/molclus/xyz2QC SR_cal/
+cp config/SR_template.gjf SR_cal/template.gjf
+
+for file in $(awk '{print $2}' isomers.smi);
+do
+        cp ${file}/final.xyz SR_cal/final.xyz
+        cd SR_cal
+        ./xyz2QC < inp2.txt
+        g16 Gaussian.gjf ../SR_result/${file}.out
+        cd ..
+done
