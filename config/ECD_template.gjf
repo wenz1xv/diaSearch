@@ -1,12 +1,9 @@
-%nprocshared=8
+%nprocshared=56
 %mem=1GB
-# apfd/6-311++g(2d,2p) polar=optrot cphf=rdfreq
+#p td=(nstates=30) apfd/6-311+g(2d,p) SCRF=(IEFPCM,Solvent=Methanol) integral(ultrafinegrid)
 
 Template file
 
 0 1
 [GEOMETRY]
-
-355nm 633nm
- 
 

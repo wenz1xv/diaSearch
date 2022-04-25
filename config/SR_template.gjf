@@ -1,0 +1,12 @@
+%nprocshared=56
+%mem=1GB
+# apfd/6-311++g(2d,2p) polar=optrot cphf=rdfreq
+ 
+R-enantiomer-OR
+ 
+0 1
+[GEOMETRY]
+ 
+589nm
+ 
+
