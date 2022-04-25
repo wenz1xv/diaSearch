@@ -16,11 +16,20 @@ cp config/inp2.txt SR_cal/
 cp config/molclus/xyz2QC SR_cal/
 cp config/SR_template.gjf SR_cal/template.gjf
 
+:>SR_result.txt
 for file in $(awk '{print $2}' isomers.smi);
 do
         cp ${file}/final.xyz SR_cal/final.xyz
         cd SR_cal
         ./xyz2QC < inp2.txt
         g16 Gaussian.gjf ../SR_result/${file}.out
+        sum=0
+        for ((i=1;i<=$(cat ${file}/ratio.txt| wc -l);i++));
+        do
+                percent=$(awk 'NR=='$i'{gsub(/%/, "");print $6}' ${file}/ratio.txt);
+                sum=$(awk '/\[Alpha\]/' ../SR_result/${file}.out |awk 'NR=='$i'{print $11*x*0.01+y}' x=$percent y=$sum);
+        done
+        echo $file $sum >> SR_result.txt
         cd ..
 done
+cat SR_result.txt

@@ -2,15 +2,14 @@
 
 
 inpfile=inp.xyz
-outfile=carbon.smi
 
-:>tmp.xyz
+:>carbon.xyz
 nums=$(awk '/C /{print NR}' $inpfile)
+n=1
 for i in $nums;
 do
-        sed "${i}s/C /Si/" $inpfile | sed "2c carbon=$[$i-2]" >> tmp.xyz
+        sed "${i}s/C /Si/" $inpfile | sed "2c carbon=$n,$[$i-2]" >> carbon.xyz
+        n=$[$n+1]
 done
-# awk '{ if($1=="C"){sub(/C /,"C"x++" ")}; print}'  inp.xyz
 
-obabel tmp.xyz -O $outfile
-rm tmp.xyz
+obabel carbon.xyz -O carbon.smi
