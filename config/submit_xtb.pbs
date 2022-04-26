@@ -7,6 +7,7 @@ inpfile='smiles.txt'
 failfile='failed.txt'
 smifile='isomers.smi'
 carbonfile='carbon.smi'
+enu=2
 
 name="$(awk '{print $2}' $inpfile)_NMR"
 
@@ -44,15 +45,32 @@ else
         echo "[$(date +%Y-%m-%d\ %H:%M:%S)]: Getting smi template"
         cnt=0
         : > $smifile
-        SMILES=$(awk '{ gsub(/\/|\\/,"t"); print $1}' $inpfile | awk '{ gsub(/@+/,"b"); print $1}')
-        count=$(echo $SMILES| tr -cd 'b' | wc -c)
-        if [[ $count -le 1 ]]; then
-                echo "Only one conformation"
-                exit
+        if [ "$enu" -eq "1" ]; then
+                SMILES=$(awk '{ gsub(/\/|\\/,"t"); print $1}' $inpfile | awk '{ gsub(/@+/,"b"); print $1}')
+                count=$(echo $SMILES| tr -cd 'b' | wc -c)
+                count1=$(echo $SMILES| tr -cd 't' | wc -c)
+                if [[ $count -le 1 ]] && [[ $count1 -le 1 ]] ; then
+                        echo "Only one conformation"
+                        exit
+                else
+                        echo "Here are $count chiral carbon, and $count1 cis-trans center"
+                fi
+                replace "$SMILES"
+        elif [ "$enu" -eq "2" ]; then
+                SMILES=$(awk '{ gsub(/@+/,"b"); print $1}' $inpfile)
+                count=$(echo $SMILES| tr -cd 'b' | wc -c)
+                if [[ $count -le 1 ]]; then
+                        echo "Only one conformation"
+                        exit
+                else
+                        echo "Here are $count chiral carbon."
+                fi
+                subreplace 1 "$SMILES" 0
         else
-                echo "Here are $count chiral carbon, and $(echo $SMILES| tr -cd 't' | wc -c) cis-trans center"
+                echo "Wrong enu mode"
+                exit
         fi
-        replace "$SMILES"
+
         if [[ $(awk '!x[$1++]' $smifile|wc -l) -ne $cnt ]]; then
                 echo "Something wrong in enumerate"
                 exit
