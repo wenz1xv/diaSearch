@@ -1,7 +1,7 @@
 #!/bin/bash
 
 maxCount=8
-energy_threshold=2
+energy_threshold=3
 root=$(pwd)
 dirname=$(awk 'NR==2{print $1}' inp.xyz)
 workDir=$(pwd)/$dirname 

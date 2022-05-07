@@ -1,6 +1,6 @@
-%nprocshared=28
+%nprocshared=56
 %mem=56GB
-# B3LYP/6-31G** NMR scrf(SMD,solvent=Chloroform)
+# B3LYP/def2TZVP NMR scrf(SMD,solvent=Chloroform)
 
 Template file
 
