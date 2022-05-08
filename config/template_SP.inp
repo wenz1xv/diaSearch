@@ -1,6 +1,6 @@
 ! PWPB95 D3 def2-QZVPP def2/J def2-QZVPP/C RIJCOSX grid4 gridx4 tightSCF noautostart miniprint nopop
 %maxcore 20000
-%pal nprocs 58 end
+%pal nprocs 56 end
 %cpcm
 smd true
 SMDsolvent "chloroform"
