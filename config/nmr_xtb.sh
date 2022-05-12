@@ -151,38 +151,29 @@ rm *.gjf
 awk '/ C .*Isotropic|NMR.*\\/{if($5 ~ /^[0-9.-]+$/){print $0 "   ppm = " base-$5;} else {print $0;}}' base=$Ciso $workDir/target.out >> $workDir/logs/CNMR.log
 awk '/ H .*Isotropic|NMR.*\\/{if($5 ~ /^[0-9.-]+$/){print $0 "   ppm = " base-$5;} else {print $0;}}' base=$Hiso $workDir/target.out >> $workDir/logs/HNMR.log
 
+
 # combine the NMR by Boltzmann Distribution
-echo "name $(awk 'NR==2{print $1}' inp.xyz)" > nmr_result.txt 
+echo "name $(awk 'NR==2{print $1}' inp.xyz)" > nmr_result.txt
 
 cd $workDir
 echo "CNMR" >> nmr_result.txt
 : > CNMR.txt
 for Cindex in $(awk '{if(!x[$1]++ && $1 ~ /^[0-9]+$/) print $1}' logs/CNMR.log);
 do
-	sum=0
-	n=1
-	for percent in $(awk '{gsub(/%/, "");print $6}' ratio.txt);
-	do
-		sum=$(awk '/ '$Cindex' /' logs/CNMR.log | awk 'NR=='$n' {print $11*x*0.01+y}' x=$percent y=$sum);
-		n=$[$n+1]
-	done
-	echo $Cindex $sum >> nmr_result.txt
-	echo $Cindex $sum >> CNMR.txt
+        percent=$(awk '{gsub(/%/, "");print $6}' ratio.txt| xargs| sed 's/ /,/g')
+        sum=$(awk '/ '$Cindex' /' logs/CNMR.log | awk -v arr=$percent 'BEGIN{split(arr,percent,",")} {sum+=$11*0.01*percent[NR]} END{print sum}');
+        echo $Cindex $sum >> nmr_result.txt
+        echo $Cindex $sum >> CNMR.txt
 done
 
 echo "HNMR" >> nmr_result.txt
 : > HNMR.txt
 for Hindex in $(awk '{if(!x[$1]++ && $1 ~ /^[0-9]+$/) print $1}' logs/HNMR.log);
 do
-	sum=0
-	n=1
-	for percent in $(awk '{gsub(/%/, "");print $6}' ratio.txt);
-	do
-		sum=$(awk '/ '$Hindex' /' logs/HNMR.log | awk 'NR=='$n' {print $11*x*0.01+y}' x=$percent y=$sum);
-		n=$[$n+1]
-	done
-	echo $Hindex $sum >> nmr_result.txt
-	echo $Hindex $sum >> HNMR.txt
+        percent=$(awk '{gsub(/%/, "");print $6}' ratio.txt| xargs| sed 's/ /,/g')
+        sum=$(awk '/ '$Hindex' /' logs/HNMR.log | awk -v arr=$percent 'BEGIN{split(arr,percent,",")} {sum+=$11*0.01*percent[NR]} END{print sum}');
+        echo $Hindex $sum >> nmr_result.txt
+        echo $Hindex $sum >> HNMR.txt
 done
 
 echo "[$(date +%Y-%m-%d\ %H:%M:%S)]: finish job $dirname"
